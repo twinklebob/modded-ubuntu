@@ -126,7 +126,7 @@ install_chromium() {
 install_firefox() {
 	[[ $(command -v firefox) ]] && echo "${Y}Firefox is already Installed!${W}\n" || {
 		echo -e "${G}Installing ${Y}Firefox${W}"
-		if [ "$DISTRO" -eq "debian" ]; then
+		if [ "$DISTRO" = "debian" ]; then
 			install_apt "firefox-esr"
 		else
 			bash <(curl -fsSL "https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/firefox.sh")
