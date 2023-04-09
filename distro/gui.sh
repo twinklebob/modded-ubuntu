@@ -7,6 +7,7 @@ W="$(printf '\033[1;37m')"
 C="$(printf '\033[1;36m')"
 arch=$(uname -m)
 username=$(getent group sudo | awk -F ':' '{print $4}' | cut -d ',' -f1)
+DISTRO="debian"
 
 check_root(){
 	if [ "$(id -u)" -ne 0 ]; then
@@ -23,7 +24,7 @@ banner() {
 		${G}    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ 
 
 	EOF
-	echo -e "${G}     A modded gui version of ubuntu for Termux\n"
+	echo -e "${G}     A modded gui version of $DISTRO for Termux\n"
 }
 
 note() {
@@ -58,7 +59,7 @@ package() {
 	dpkg --configure -a
 	apt-mark hold udisks2
 	
-	packs=(sudo gnupg2 curl nano git xz-utils at-spi2-core xfce4 xfce4-goodies xfce4-terminal librsvg2-common menu inetutils-tools dialog exo-utils tigervnc-standalone-server tigervnc-common tigervnc-tools dbus-x11 fonts-beng fonts-beng-extra gtk2-engines-murrine gtk2-engines-pixbuf apt-transport-https)
+	packs=(sudo gnupg2 curl nano git xz-utils at-spi2-core xfce4 xfce4-goodies xfce4-terminal librsvg2-common menu inetutils-tools dialog exo-utils tigervnc-standalone-server tigervnc-common dbus-x11 fonts-beng fonts-beng-extra gtk2-engines-murrine gtk2-engines-pixbuf apt-transport-https)
 	for hulu in "${packs[@]}"; do
 		type -p "$hulu" &>/dev/null || {
 			echo -e "\n${R} [${W}-${R}]${G} Installing package : ${Y}$hulu${W}"
@@ -88,7 +89,7 @@ install_vscode() {
 		apt update -y
 		apt install code -y
 		echo "Patching.."
-		curl -fsSL https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/patches/code.desktop > /usr/share/applications/code.desktop
+		curl -fsSL https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/patches/code.desktop > /usr/share/applications/code.desktop
 		echo -e "${C} Visual Studio Code Installed Successfully\n${W}"
 	}
 }
@@ -125,8 +126,12 @@ install_chromium() {
 install_firefox() {
 	[[ $(command -v firefox) ]] && echo "${Y}Firefox is already Installed!${W}\n" || {
 		echo -e "${G}Installing ${Y}Firefox${W}"
-		bash <(curl -fsSL "https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/distro/firefox.sh")
-		echo -e "${G} Firefox Installed Successfully\n${W}"
+		if [ "$DISTRO" -eq "debian" ]; then
+			install_apt "firefox-esr"
+		else
+			bash <(curl -fsSL "https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/firefox.sh")
+			echo -e "${G} Firefox Installed Successfully\n${W}"
+		fi
 	}
 }
 
@@ -215,7 +220,7 @@ downloader(){
 }
 
 sound_fix() {
-	echo "$(echo "bash ~/.sound" | cat - /data/data/com.termux/files/usr/bin/ubuntu)" > /data/data/com.termux/files/usr/bin/ubuntu
+	echo "$(echo "bash ~/.sound" | cat - /data/data/com.termux/files/usr/bin/$DISTRO)" > /data/data/com.termux/files/usr/bin/$DISTRO
 	echo "export DISPLAY=":1"" >> /etc/profile
 	echo "export PULSE_SERVER=127.0.0.1" >> /etc/profile 
 	source /etc/profile
@@ -255,7 +260,7 @@ config() {
 	downloader "icons.tar.gz" "https://github.com/modded-ubuntu/modded-ubuntu/releases/download/config/icons.tar.gz"
 	downloader "wallpaper.tar.gz" "https://github.com/modded-ubuntu/modded-ubuntu/releases/download/config/wallpaper.tar.gz"
 	downloader "gtk-themes.tar.gz" "https://github.com/modded-ubuntu/modded-ubuntu/releases/download/config/gtk-themes.tar.gz"
-	downloader "ubuntu-settings.tar.gz" "https://github.com/modded-ubuntu/modded-ubuntu/releases/download/config/ubuntu-settings.tar.gz"
+	downloader "ubuntu-settings.tar.gz" "https://github.com/twinklebob/modded-ubuntu/releases/download/config/ubuntu-settings.tar.gz"
 
 	echo -e "${R} [${W}-${R}]${C} Unpacking Files..\n"${W}
 	tar -xvzf fonts.tar.gz -C "/usr/local/share/fonts/"

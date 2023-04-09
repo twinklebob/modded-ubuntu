@@ -6,13 +6,15 @@ Y="$(printf '\033[1;33m')"
 W="$(printf '\033[1;37m')"
 C="$(printf '\033[1;36m')"
 
+DISTRO="debian"
+
 banner() {
     clear
     printf "\033[33m    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  \033[0m\n"
     printf "\033[36m    |  | |__] |  | |\ |  |  |  |    |\/| |  | |  \ \033[0m\n"
     printf "\033[32m    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ \033[0m\n"
     printf "\033[0m\n"
-    printf "     \033[32mA modded gui version of ubuntu for Termux\033[0m\n"
+    printf "     \033[32mA modded gui version of $DISTRO for Termux\033[0m\n"
     printf "\033[0m\n"
 
 }
@@ -36,21 +38,21 @@ login() {
     usermod -aG sudo ${user}
     echo "${user}:${pass}" | chpasswd
     echo "$user ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
-    echo "proot-distro login --user $user ubuntu --bind /dev/null:/proc/sys/kernel/cap_last_last --shared-tmp --fix-low-ports" > /data/data/com.termux/files/usr/bin/ubuntu
-    #chmod +x /data/data/com.termux/files/usr/bin/ubuntu 
+    echo "proot-distro login --user $user $DISTRO --bind /dev/null:/proc/sys/kernel/cap_last_last --shared-tmp --fix-low-ports" > /data/data/com.termux/files/usr/bin/$DISTRO
+    #chmod +x /data/data/com.termux/files/usr/bin/$DISTRO 
     
     if [[ -e '/data/data/com.termux/files/home/modded-ubuntu/distro/gui.sh' ]];then
         cp /data/data/com.termux/files/home/modded-ubuntu/distro/gui.sh /home/$user/gui.sh
         chmod +x /home/$user/gui.sh
     else
-        wget -q --show-progress https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/distro/gui.sh
+        wget -q --show-progress https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/gui.sh
         mv -vf gui.sh /home/$user/gui.sh
         chmod +x /home/$user/gui.sh
     fi
 
     clear
     echo
-    echo -e "\n${R} [${W}-${R}]${G} Restart your Termux & Type ${C}ubuntu"${W}
+    echo -e "\n${R} [${W}-${R}]${G} Restart your Termux & Type ${C}$DISTRO"${W}
     echo -e "\n${R} [${W}-${R}]${G} Then Type ${C}bash gui.sh "${W}
     echo
 

@@ -8,7 +8,8 @@ C="$(printf '\033[1;36m')"
 W="$(printf '\033[1;37m')" 
 
 CURR_DIR=$(realpath "$(dirname "$BASH_SOURCE")")
-UBUNTU_DIR="$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu"
+DISTRO="debian"
+UBUNTU_DIR="$PREFIX/var/lib/proot-distro/installed-rootfs/$DISTRO"
 
 banner() {
 	clear
@@ -18,7 +19,7 @@ banner() {
 		${G}    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ 
 
 	EOF
-	echo -e "${G}     A modded gui version of ubuntu for Termux\n\n"${W}
+	echo -e "${G}     A modded gui version of $DISTRO for Termux\n\n"${W}
 }
 
 package() {
@@ -49,7 +50,7 @@ distro() {
 		echo -e "\n${R} [${W}-${R}]${G} Distro already installed."${W}
 		exit 0
 	else
-		proot-distro install ubuntu
+		proot-distro install $DISTRO
 		termux-reload-settings
 	fi
 	
@@ -82,14 +83,14 @@ setup_vnc() {
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstart" ]]; then
 		cp -f "$CURR_DIR/distro/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
 	else
-		downloader "$CURR_DIR/vncstart" "https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/distro/vncstart"
+		downloader "$CURR_DIR/vncstart" "https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/vncstart"
 		mv -f "$CURR_DIR/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
 	fi
 
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstop" ]]; then
 		cp -f "$CURR_DIR/distro/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
 	else
-		downloader "$CURR_DIR/vncstop" "https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/distro/vncstop"
+		downloader "$CURR_DIR/vncstop" "https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/vncstop"
 		mv -f "$CURR_DIR/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
 	fi
 	chmod +x "$UBUNTU_DIR/usr/local/bin/vncstart"
@@ -103,25 +104,25 @@ permission() {
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/user.sh" ]]; then
 		cp -f "$CURR_DIR/distro/user.sh" "$UBUNTU_DIR/root/user.sh"
 	else
-		downloader "$CURR_DIR/user.sh" "https://raw.githubusercontent.com/modded-ubuntu/modded-ubuntu/master/distro/user.sh"
+		downloader "$CURR_DIR/user.sh" "https://raw.githubusercontent.com/twinklebob/modded-ubuntu/master/distro/user.sh"
 		mv -f "$CURR_DIR/user.sh" "$UBUNTU_DIR/root/user.sh"
 	fi
 	chmod +x $UBUNTU_DIR/root/user.sh
 
 	setup_vnc
 	echo "$(getprop persist.sys.timezone)" > $UBUNTU_DIR/etc/timezone
-	echo "proot-distro login ubuntu" > $PREFIX/bin/ubuntu
-	chmod +x "$PREFIX/bin/ubuntu"
+	echo "proot-distro login $DISTRO" > $PREFIX/bin/$DISTRO
+	chmod +x "$PREFIX/bin/$DISTRO"
 	termux-reload-settings
 
-	if [[ -e "$PREFIX/bin/ubuntu" ]]; then
+	if [[ -e "$PREFIX/bin/$DISTRO" ]]; then
 		banner
 		cat <<- EOF
-			${R} [${W}-${R}]${G} Ubuntu-22.04 (CLI) is now Installed on your Termux
+			${R} [${W}-${R}]${G} $DISTRO (CLI) is now Installed on your Termux
 			${R} [${W}-${R}]${G} Restart your Termux to Prevent Some Issues.
-			${R} [${W}-${R}]${G} Type ${C}ubuntu${G} to run Ubuntu CLI.
-			${R} [${W}-${R}]${G} If you Want to Use UBUNTU in GUI MODE then ,
-			${R} [${W}-${R}]${G} Run ${C}ubuntu${G} first & then type ${C}bash user.sh${W}
+			${R} [${W}-${R}]${G} Type ${C}$DISTRO${G} to run CLI.
+			${R} [${W}-${R}]${G} If you Want to Use it in GUI MODE then ,
+			${R} [${W}-${R}]${G} Run ${C}$DISTRO${G} first & then type ${C}bash user.sh${W}
 		EOF
 		{ echo; sleep 2; exit 1; }
 	else
